@@ -1,4 +1,5 @@
 ﻿using RocketseatAuction.API.Comunication.Requests;
+using RocketseatAuction.API.Contratos;
 using RocketseatAuction.API.Entities;
 using RocketseatAuction.API.Repositories;
 using RocketseatAuction.API.Services;
@@ -8,14 +9,14 @@ namespace RocketseatAuction.API.UseCases.Offers.CreateOffer
     public class CreateOfferUseCase
     {   
         private readonly LoggedUser _loggedUser;
-        public CreateOfferUseCase(LoggedUser loggedUser)
+        private readonly IOfferRepository _offerRepository;
+        public CreateOfferUseCase(LoggedUser loggedUser, IOfferRepository offerRepository)
         {
             _loggedUser = loggedUser;
+            _offerRepository = offerRepository;
         }
         public int Execute(int itemId,RequestCreateOfferJson request)
         {
-            var repository = new RocketseatAuctionDbContext();
-
             var user = _loggedUser.User();
 
             var offer = new Offer
@@ -26,8 +27,7 @@ namespace RocketseatAuction.API.UseCases.Offers.CreateOffer
                 UserId = user.Id
             };
 
-            repository.Offers.Add(offer);
-            repository.SaveChanges();
+            _offerRepository.Add(offer);
 
             return offer.Id;
         }
